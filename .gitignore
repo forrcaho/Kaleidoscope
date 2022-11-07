@@ -12,4 +12,4 @@
 /_build/
 /results/
 generated-testcase.cpp
-.arduino
+bin/arduino-cli.exe
