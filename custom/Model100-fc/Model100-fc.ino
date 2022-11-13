@@ -39,21 +39,6 @@
 // Support for LED modes that set all LEDs to a single color
 #include "Kaleidoscope-LEDEffect-SolidColor.h"
 
-// Support for an LED mode that makes all the LEDs 'breathe'
-// #include "Kaleidoscope-LEDEffect-Breathe.h"
-
-// Support for an LED mode that makes a red pixel chase a blue pixel across the keyboard
-// #include "Kaleidoscope-LEDEffect-Chase.h"
-
-// Support for LED modes that pulse the keyboard's LED in a rainbow pattern
-// #include "Kaleidoscope-LEDEffect-Rainbow.h"
-
-// Support for an LED mode that lights up the keys as you press them
-// #include "Kaleidoscope-LED-Stalker.h"
-
-// Support for an LED mode that prints the keys you press in letters 4px high
-// #include "Kaleidoscope-LED-AlphaSquare.h"
-
 // Support for shared palettes for other plugins, like Colormap below
 #include "Kaleidoscope-LED-Palette-Theme.h"
 
@@ -98,6 +83,7 @@
 #include "Kaleidoscope-Steno.h"
 
 #include "Kaleidoscope-CharShift.h"
+#include "Kaleidoscope-Heatmap.h"
 
 // custom plugins
 namespace kaleidoscope {
@@ -148,8 +134,14 @@ kaleidoscope::plugin::ModifierBlocker ModifierBlocker;
 enum {
   MACRO_VERSION_INFO,
   MACRO_ANY,
+  MACRO_AND,
+  MACRO_ARROW,
   MACRO_ENDLINE,
-  MACRO_NUMPAD
+  MACRO_EQ,
+  MACRO_EQEQ,
+  MACRO_NEEQ,
+  MACRO_NUMPAD,
+  MACRO_OR
 };
 
 
@@ -207,26 +199,6 @@ enum {
   FUNCTION,
 };  // layers
 
-
-/**
-  * To change your keyboard's layout from QWERTY to DVORAK or COLEMAK, comment out the line
-  *
-  * #define PRIMARY_KEYMAP_QWERTY
-  *
-  * by changing it to
-  *
-  * // #define PRIMARY_KEYMAP_QWERTY
-  *
-  * Then uncomment the line corresponding to the layout you want to use.
-  *
-  */
-
-// #define PRIMARY_KEYMAP_QWERTY
-// #define PRIMARY_KEYMAP_DVORAK
-// #define PRIMARY_KEYMAP_COLEMAK
-#define PRIMARY_KEYMAP_CUSTOM
-
-
 /* This comment temporarily turns off astyle's indent enforcement
  *   so we can make the keymaps actually resemble the physical key layout better
  */
@@ -234,64 +206,12 @@ enum {
 
 KEYMAPS(
 
-#if defined (PRIMARY_KEYMAP_QWERTY)
   [PRIMARY] = KEYMAP_STACKED
   (___,          Key_1, Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
    Key_Backtick, Key_Q, Key_W, Key_E, Key_R, Key_T, Key_Tab,
-   Key_PageUp,   Key_A, Key_S, Key_D, Key_F, Key_G,
-   Key_PageDown, Key_Z, Key_X, Key_C, Key_V, Key_B, Key_Escape,
-   Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
-   ShiftToLayer(FUNCTION),
-
-   M(MACRO_ANY),  Key_6, Key_7, Key_8,     Key_9,         Key_0,         LockLayer(NUMPAD),
-   Key_Enter,     Key_Y, Key_U, Key_I,     Key_O,         Key_P,         Key_Equals,
-                  Key_H, Key_J, Key_K,     Key_L,         Key_Semicolon, Key_Quote,
-   Key_RightAlt,  Key_N, Key_M, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
-   Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
-   ShiftToLayer(FUNCTION)),
-
-#elif defined (PRIMARY_KEYMAP_DVORAK)
-
-  [PRIMARY] = KEYMAP_STACKED
-  (___,          Key_1,         Key_2,     Key_3,      Key_4, Key_5, Key_LEDEffectNext,
-   Key_Backtick, Key_Quote,     Key_Comma, Key_Period, Key_P, Key_Y, Key_Tab,
-   Key_PageUp,   Key_A,         Key_O,     Key_E,      Key_U, Key_I,
-   Key_PageDown, Key_Semicolon, Key_Q,     Key_J,      Key_K, Key_X, Key_Escape,
-   Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
-   ShiftToLayer(FUNCTION),
-
-   M(MACRO_ANY),   Key_6, Key_7, Key_8, Key_9, Key_0, LockLayer(NUMPAD),
-   Key_Enter,      Key_F, Key_G, Key_C, Key_R, Key_L, Key_Slash,
-                   Key_D, Key_H, Key_T, Key_N, Key_S, Key_Minus,
-   Key_RightAlt,   Key_B, Key_M, Key_W, Key_V, Key_Z, Key_Equals,
-   Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
-   ShiftToLayer(FUNCTION)),
-
-#elif defined (PRIMARY_KEYMAP_COLEMAK)
-
-  [PRIMARY] = KEYMAP_STACKED
-  (___,          Key_1, Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
-   Key_Backtick, Key_Q, Key_W, Key_F, Key_P, Key_B, Key_Tab,
-   Key_PageUp,   Key_A, Key_R, Key_S, Key_T, Key_G,
-   Key_PageDown, Key_Z, Key_X, Key_C, Key_D, Key_V, Key_Escape,
-   Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
-   ShiftToLayer(FUNCTION),
-
-   M(MACRO_ANY),  Key_6, Key_7, Key_8,     Key_9,         Key_0,         LockLayer(NUMPAD),
-   Key_Enter,     Key_J, Key_L, Key_U,     Key_Y,         Key_Semicolon, Key_Equals,
-                  Key_M, Key_N, Key_E,     Key_I,         Key_O,         Key_Quote,
-   Key_RightAlt,  Key_K, Key_H, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
-   Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
-   ShiftToLayer(FUNCTION)),
-
-#elif defined (PRIMARY_KEYMAP_CUSTOM)
-  // Edit this keymap to make a custom layout
-  [PRIMARY] = KEYMAP_STACKED
-  (___,          Key_1, Key_2, Key_3, Key_4, Key_5, Key_LEDEffectNext,
-   Key_Backtick, Key_Q, Key_W, Key_E, Key_R, Key_T, Key_Tab,
-   Key_PageUp,   Key_A, Key_S, Key_D, Key_F, Key_G,
-   Key_PageDown, Key_Z, Key_X, Key_C, Key_V, Key_B, Key_Escape,
-   Key_LeftControl, Key_Backspace, Key_LeftShift, Key_LeftGui,
+   Key_Enter,    Key_A, Key_S, Key_D, Key_F, Key_G,
+   Key_LeftAlt,  Key_Z, Key_X, Key_C, Key_V, Key_B, Key_Escape,
+   Key_LeftControl, Key_Spacebar, Key_LeftShift, Key_LeftGui,
    ShiftToLayer(FUNCTION),
 
    M(MACRO_ANY),  Key_6, Key_7, Key_8,     Key_9,         Key_0,         M(MACRO_NUMPAD),
@@ -300,14 +220,6 @@ KEYMAPS(
    Key_RightAlt,  Key_N, Key_M, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
    Key_LeftAlt, Key_RightShift, Key_Spacebar, Key_RightControl,
    ShiftToLayer(FUNCTION)),
-
-#else
-
-#error "No default keymap defined. You should make sure that you have a line like '#define PRIMARY_KEYMAP_QWERTY' in your sketch"
-
-#endif
-
-
 
   [NUMPAD] =  KEYMAP_STACKED
   (___, ___, ___, ___, ___, ___, ___,
@@ -325,19 +237,20 @@ KEYMAPS(
    ___),
 
   [FUNCTION] =  KEYMAP_STACKED
-  (___,      Key_F1,              Key_F2, Key_F3, Key_F4, Key_F5, Key_CapsLock,
-   Key_Tab,  ___,                 ___,    CS(2),  CS(3),  ___,    ___,
-   Key_Home, ___,                 ___,    CS(0),  CS(1),  ___,
-   Key_End,  ___,                 ___,    ___,    ___,    ___,    ___,
-   ___, Key_Delete, ___, ___,
+  (___,      Key_F1, Key_F2,      Key_F3,         Key_F4,        Key_F5,    Key_CapsLock,
+   Key_Tab,  ___,    M(MACRO_EQ), M(MACRO_NEEQ),  M(MACRO_AND),  ___,       ___,
+   ___,      ___,    Key_Minus,   M(MACRO_EQEQ),  M(MACRO_OR),   ___,
+   ___,      ___,    CS(0),       M(MACRO_ARROW), ___,           ___,       ___,
+   ___, Key_Backspace, ___, ___,
    ___,
 
    ___,                 Key_F6,         Key_F7,        Key_F8,        Key_F9,         Key_F10,          Key_F11,
    ___,                 ___,            Key_Home,      Key_UpArrow,   Key_PageUp,     ___,              Key_F12,
                         Key_Insert,     Key_LeftArrow, Key_DownArrow, Key_RightArrow, M(MACRO_ENDLINE), ___,
    Key_PcApplication,   Key_Delete,     Key_End,       Key_DownArrow, Key_PageDown,   Key_Backslash,    Key_Pipe,
-   ___, ___, Key_Enter, ___,
+   ___, ___, Key_Backspace, ___,
    ___)
+
 ) // KEYMAPS
 
 /* Re-enable astyle's indent enforcement */
@@ -382,8 +295,7 @@ bool isShiftKeyHeld() {
 bool isCtrlKeyHeld() {
   for (Key key : kaleidoscope::live_keys.all()) {
     if (key.isKeyboardModifier() &&
-        (key.getKeyCode() == HID_KEYBOARD_LEFT_CONTROL ||
-         key.getKeyCode() == HID_KEYBOARD_RIGHT_CONTROL))
+        (key == Key_LeftControl || key == Key_RightControl))
       return true;
   }
   return false;
@@ -392,10 +304,8 @@ bool isCtrlKeyHeld() {
 bool isOtherModifierHeld() {
   for (Key key : kaleidoscope::live_keys.all()) {
     if (key.isKeyboardModifier() &&
-        !(key.getKeyCode() == HID_KEYBOARD_LEFT_SHIFT ||
-          key.getKeyCode() == HID_KEYBOARD_RIGHT_SHIFT ||
-          key.getKeyCode() == HID_KEYBOARD_LEFT_CONTROL ||
-          key.getKeyCode() == HID_KEYBOARD_RIGHT_CONTROL))
+        !(key == Key_LeftShift || key == Key_RightShift ||
+          key == Key_LeftControl || key == Key_RightControl))
       return true;
   }
   return false;
@@ -428,6 +338,26 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
     anyKeyMacro(event);
     break;
 
+  case MACRO_AND:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      Macros.type(PSTR("&"));
+      if (!shiftHeld) Macros.type(PSTR("&"));
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
+    break;
+
+  case MACRO_ARROW:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      if (shiftHeld)
+        Macros.type(PSTR("->"));
+      else
+        Macros.type(PSTR("=>"));
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
+    break;
+
   case MACRO_ENDLINE:
     if (keyToggledOn(event.state)) {
       Macros.tap(Key_End);
@@ -436,9 +366,47 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
     }
     break;
 
+  case MACRO_EQ:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      if (shiftHeld)
+        Macros.tap(LSHIFT(Key_Equals));
+      else
+        Macros.tap(Key_Equals);
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
+    break;
+
+  case MACRO_EQEQ:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      Macros.type(PSTR("=="));
+      if (!shiftHeld) Macros.type(PSTR("="));
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
+    break;
+
+  case MACRO_NEEQ:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      Macros.type(PSTR("!="));
+      if (!shiftHeld) Macros.type(PSTR("="));
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
+    break;
+
   case MACRO_NUMPAD:
     if (keyToggledOn(event.state) && ctrlHeld)
       Macros.tap(LockLayer(NUMPAD));
+    break;
+
+  case MACRO_OR:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      Macros.type(PSTR("|"));
+      if (!shiftHeld) Macros.type(PSTR("|"));
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
     break;
   }
   ModifierBlocker.disable();
@@ -450,7 +418,6 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
 // LED color modes calibrated to draw 500mA or less on the
 // Keyboardio Model 100.
 
-
 static kaleidoscope::plugin::LEDSolidColor solidRed(160, 0, 0);
 static kaleidoscope::plugin::LEDSolidColor solidOrange(140, 70, 0);
 static kaleidoscope::plugin::LEDSolidColor solidYellow(130, 100, 0);
@@ -458,6 +425,14 @@ static kaleidoscope::plugin::LEDSolidColor solidGreen(0, 160, 0);
 static kaleidoscope::plugin::LEDSolidColor solidBlue(0, 70, 130);
 static kaleidoscope::plugin::LEDSolidColor solidIndigo(0, 0, 170);
 static kaleidoscope::plugin::LEDSolidColor solidViolet(130, 0, 120);
+
+// I'm defining heatmap colors here to hopefully not draw too much current
+static const cRGB heat_colors[] PROGMEM = {
+  {8, 8, 8},    // dark grey
+  {0, 0, 192},  // blue
+  {0, 192, 0},  // green
+  {192, 0, 0}   // red
+};
 
 /** toggleLedsOnSuspendResume toggles the LEDs off when the host goes to sleep,
  * and turns them back on when it wakes up.
@@ -582,17 +557,7 @@ KALEIDOSCOPE_INIT_PLUGINS(
   // We start with the LED effect that turns off all the LEDs.
   LEDOff,
 
-  // The rainbow effect changes the color of all of the keyboard's keys at the same time
-  // running through all the colors of the rainbow.
-  // LEDRainbowEffect,
-
-  // The rainbow wave effect lights up your keyboard with all the colors of a rainbow
-  // and slowly moves the rainbow across your keyboard
-  // LEDRainbowWaveEffect,
-
-  // The chase effect follows the adventure of a blue pixel which chases a red pixel across
-  // your keyboard. Spoiler: the blue pixel never catches the red pixel
-  // LEDChaseEffect,
+  HeatmapEffect,
 
   // These static effects turn your keyboard's LEDs a variety of colors
   solidRed,
@@ -602,16 +567,6 @@ KALEIDOSCOPE_INIT_PLUGINS(
   solidBlue,
   solidIndigo,
   solidViolet,
-
-  // The breathe effect slowly pulses all of the LEDs on your keyboard
-  // LEDBreatheEffect,
-
-  // The AlphaSquare effect prints each character you type, using your
-  // keyboard's LEDs as a display
-  // AlphaSquareEffect,
-
-  // The stalker effect lights up the keys you've pressed recently
-  // StalkerEffect,
 
   // The LED Palette Theme plugin provides a shared palette for other plugins,
   // like Colormap below
@@ -698,21 +653,8 @@ void setup() {
   // needs to be explicitly told which keymap layer is your numpad layer
   NumPad.numPadLayer = NUMPAD;
 
-  // We configure the AlphaSquare effect to use RED letters
-  // AlphaSquare.color = CRGB(255, 0, 0);
-
-  // We set the brightness of the rainbow effects to 150 (on a scale of 0-255)
-  // This draws more than 500mA, but looks much nicer than a dimmer effect
-  // LEDRainbowEffect.brightness(255);
-  // LEDRainbowWaveEffect.brightness(255);
-
   // Set the action key the test mode should listen for to Left Fn
   HardwareTestMode.setActionKey(R3C6);
-
-  // The LED Stalker mode has a few effects. The one we like is called
-  // 'BlazingTrail'. For details on other options, see
-  // https://github.com/keyboardio/Kaleidoscope/blob/master/docs/plugins/LED-Stalker.md
-  // StalkerEffect.variant = STALKER(BlazingTrail);
 
   // To make the keymap editable without flashing new firmware, we store
   // additional layers in EEPROM. For now, we reserve space for eight layers. If
@@ -720,6 +662,9 @@ void setup() {
   // by using the `settings.defaultLayer` Focus command, or by using the
   // `keymap.onlyCustom` command to use EEPROM layers only.
   EEPROMKeymap.setup(8);
+
+  HeatmapEffect.heat_colors        = heat_colors;
+  HeatmapEffect.heat_colors_length = 4;
 
   // We need to tell the Colormap plugin how many layers we want to have custom
   // maps for. To make things simple, we set it to eight layers, which is how
@@ -734,11 +679,6 @@ void setup() {
   // here.
   Layer.move(EEPROMSettings.default_layer());
 
-  // To avoid any surprises, SpaceCadet is turned off by default. However, it
-  // can be permanently enabled via Chrysalis, so we should only disable it if
-  // no configuration exists.
-  // SpaceCadetConfig.disableSpaceCadetIfUnconfigured();
-
   //Set the SpaceCadet map
   //Setting is {KeyThatWasPressed, AlternativeKeyToSend, TimeoutInMS}
   //Note: must end with the SPACECADET_MAP_END delimiter
@@ -752,7 +692,6 @@ void setup() {
     {Key_RightShift, Key_RightCurlyBracket, 250},
     SPACECADET_MAP_END,
   };
-  //Set the map.
   SpaceCadet.setMap(spacecadetmap);
 
   // Editable layer names are stored in EEPROM too, and we reserve 16 bytes per
@@ -763,13 +702,10 @@ void setup() {
   // Unless configured otherwise with Chrysalis, we want to make sure that the
   // firmware starts with LED effects off. This avoids over-taxing devices that
   // don't have a lot of power to share with USB devices
-  DefaultLEDModeConfig.activateLEDModeIfUnconfigured(&LEDOff);
+  DefaultLEDModeConfig.activateLEDModeIfUnconfigured(&HeatmapEffect);
 
   CS_KEYS(
-    kaleidoscope::plugin::CharShift::KeyPair(LSHIFT(Key_LeftBracket), Key_LeftBracket),
-    kaleidoscope::plugin::CharShift::KeyPair(LSHIFT(Key_RightBracket), Key_RightBracket),
-    kaleidoscope::plugin::CharShift::KeyPair(LSHIFT(Key_9), LSHIFT(Key_Comma)),
-    kaleidoscope::plugin::CharShift::KeyPair(LSHIFT(Key_0), LSHIFT(Key_Period)));
+    kaleidoscope::plugin::CharShift::KeyPair(Key_Slash, Key_Backslash));
 }
 
 /** loop is the second of the standard Arduino sketch functions.
