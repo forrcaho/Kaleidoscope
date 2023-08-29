@@ -137,7 +137,6 @@ enum {
   MACRO_AND,
   MACRO_ARROW,
   MACRO_ENDLINE,
-  MACRO_EQ,
   MACRO_EQEQ,
   MACRO_NEEQ,
   MACRO_NUMPAD,
@@ -238,9 +237,9 @@ KEYMAPS(
 
   [FUNCTION] =  KEYMAP_STACKED
   (___,      Key_F1, Key_F2,      Key_F3,         Key_F4,        Key_F5,    Key_CapsLock,
-   Key_Tab,  ___,    M(MACRO_EQ), M(MACRO_NEEQ),  M(MACRO_AND),  ___,       ___,
+   Key_Tab,  ___,    Key_Equals,  M(MACRO_NEEQ),  M(MACRO_AND),  ___,       ___,
    ___,      ___,    Key_Minus,   M(MACRO_EQEQ),  M(MACRO_OR),   ___,
-   ___,      ___,    CS(0),       M(MACRO_ARROW), ___,           ___,       ___,
+   ___,      ___,    CS(0),       M(MACRO_ARROW), CS(1),         ___,       ___,
    ___, Key_Backspace, ___, ___,
    ___,
 
@@ -363,17 +362,6 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
       Macros.tap(Key_End);
       if (!shiftHeld) Macros.tap(Key_Semicolon);
       if (!ctrlHeld) Macros.tap(Key_Enter);
-    }
-    break;
-
-  case MACRO_EQ:
-    if (keyToggledOn(event.state)) {
-      if (!ctrlHeld) Macros.tap(Key_Spacebar);
-      if (shiftHeld)
-        Macros.tap(LSHIFT(Key_Equals));
-      else
-        Macros.tap(Key_Equals);
-      if (!ctrlHeld) Macros.tap(Key_Spacebar);
     }
     break;
 
@@ -705,7 +693,9 @@ void setup() {
   DefaultLEDModeConfig.activateLEDModeIfUnconfigured(&HeatmapEffect);
 
   CS_KEYS(
-    kaleidoscope::plugin::CharShift::KeyPair(Key_Slash, Key_Backslash));
+    kaleidoscope::plugin::CharShift::KeyPair(Key_Slash, Key_Backslash),     // slash and backslash
+    kaleidoscope::plugin::CharShift::KeyPair(LSHIFT(Key_1), LSHIFT(Key_8))  // bang and star
+  );
 }
 
 /** loop is the second of the standard Arduino sketch functions.
