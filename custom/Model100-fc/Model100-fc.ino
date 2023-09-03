@@ -248,7 +248,7 @@ KEYMAPS(
 
    ___,                 Key_F6, Key_F7,        Key_F8,        Key_F9,         Key_F10,          Key_F11,
    ___,                 ___,    Key_Home,      Key_UpArrow,   Key_PageUp,     Key_Insert,       Key_F12,
-                        ___,    Key_LeftArrow, Key_DownArrow, Key_RightArrow, M(MACRO_ENDLINE), ___,
+                        ___,    Key_LeftArrow, Key_DownArrow, Key_RightArrow, M(MACRO_ENDC),    ___,
    Key_PcApplication,   ___,    Key_End,       Key_DownArrow, Key_PageDown,   Key_Delete,       ___,
    ___, ___, Key_Backspace, ___,
    ___)
