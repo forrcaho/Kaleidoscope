@@ -134,13 +134,16 @@ kaleidoscope::plugin::ModifierBlocker ModifierBlocker;
 enum {
   MACRO_VERSION_INFO,
   MACRO_ANY,
-  MACRO_AND,
-  MACRO_ARROW,
-  MACRO_ENDLINE,
+  MACRO_AMP,
+  MACRO_ARRO,
+  MACRO_ENDC,
   MACRO_EQEQ,
+  MACRO_EQL,
+  MACRO_MINS,
   MACRO_NEEQ,
   MACRO_NUMPAD,
-  MACRO_OR
+  MACRO_QMRK,
+  MACRO_VBAR
 };
 
 
@@ -236,17 +239,17 @@ KEYMAPS(
    ___),
 
   [FUNCTION] =  KEYMAP_STACKED
-  (___,      Key_F1, Key_F2,      Key_F3,         Key_F4,        Key_F5,    Key_CapsLock,
-   Key_Tab,  ___,    Key_Equals,  M(MACRO_NEEQ),  M(MACRO_AND),  ___,       ___,
-   ___,      ___,    Key_Minus,   M(MACRO_EQEQ),  M(MACRO_OR),   ___,
-   ___,      ___,    CS(0),       M(MACRO_ARROW), CS(1),         ___,       ___,
+  (___,      Key_F1,        Key_F2,         Key_F3,       Key_F4,        Key_F5,        Key_CapsLock,
+   Key_Tab,  ___,           M(MACRO_AMP),   CS(0),        CS(1),         M(MACRO_NEEQ), ___,
+   ___,      M(MACRO_ENDC), M(MACRO_VBAR),  CS(2),        CS(3),         M(MACRO_EQEQ),
+    ___,      CS(4),         M(MACRO_QMRK), M(MACRO_EQL), M(MACRO_MINS), M(MACRO_ARRO), ___,
    ___, Key_Backspace, ___, ___,
    ___,
 
-   ___,                 Key_F6,         Key_F7,        Key_F8,        Key_F9,         Key_F10,          Key_F11,
-   ___,                 ___,            Key_Home,      Key_UpArrow,   Key_PageUp,     ___,              Key_F12,
-                        Key_Insert,     Key_LeftArrow, Key_DownArrow, Key_RightArrow, M(MACRO_ENDLINE), ___,
-   Key_PcApplication,   Key_Delete,     Key_End,       Key_DownArrow, Key_PageDown,   Key_Backslash,    Key_Pipe,
+   ___,                 Key_F6, Key_F7,        Key_F8,        Key_F9,         Key_F10,          Key_F11,
+   ___,                 ___,    Key_Home,      Key_UpArrow,   Key_PageUp,     Key_Insert,       Key_F12,
+                        ___,    Key_LeftArrow, Key_DownArrow, Key_RightArrow, M(MACRO_ENDLINE), ___,
+   Key_PcApplication,   ___,    Key_End,       Key_DownArrow, Key_PageDown,   Key_Delete,       ___,
    ___, ___, Key_Backspace, ___,
    ___)
 
@@ -337,7 +340,7 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
     anyKeyMacro(event);
     break;
 
-  case MACRO_AND:
+  case MACRO_AMP:
     if (keyToggledOn(event.state)) {
       if (!ctrlHeld) Macros.tap(Key_Spacebar);
       Macros.type(PSTR("&"));
@@ -346,7 +349,7 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
     }
     break;
 
-  case MACRO_ARROW:
+  case MACRO_ARRO:
     if (keyToggledOn(event.state)) {
       if (!ctrlHeld) Macros.tap(Key_Spacebar);
       if (shiftHeld)
@@ -357,7 +360,7 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
     }
     break;
 
-  case MACRO_ENDLINE:
+  case MACRO_ENDC:
     if (keyToggledOn(event.state)) {
       Macros.tap(Key_End);
       if (!shiftHeld) Macros.tap(Key_Semicolon);
@@ -370,6 +373,28 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
       if (!ctrlHeld) Macros.tap(Key_Spacebar);
       Macros.type(PSTR("=="));
       if (!shiftHeld) Macros.type(PSTR("="));
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
+    break;
+
+  case MACRO_EQL:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      if (shiftHeld)
+        Macros.type(PSTR("+"));
+      else
+        Macros.type(PSTR("="));
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
+    break;
+
+  case MACRO_MINS:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      if (shiftHeld)
+        Macros.type(PSTR("*"));
+      else
+        Macros.type(PSTR("-"));
       if (!ctrlHeld) Macros.tap(Key_Spacebar);
     }
     break;
@@ -388,7 +413,16 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
       Macros.tap(LockLayer(NUMPAD));
     break;
 
-  case MACRO_OR:
+  case MACRO_QMRK:
+    if (keyToggledOn(event.state)) {
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+      Macros.type(PSTR("?"));
+      if (!shiftHeld) Macros.type(PSTR("?"));
+      if (!ctrlHeld) Macros.tap(Key_Spacebar);
+    }
+    break;
+
+  case MACRO_VBAR:
     if (keyToggledOn(event.state)) {
       if (!ctrlHeld) Macros.tap(Key_Spacebar);
       Macros.type(PSTR("|"));
@@ -693,8 +727,11 @@ void setup() {
   DefaultLEDModeConfig.activateLEDModeIfUnconfigured(&HeatmapEffect);
 
   CS_KEYS(
-    kaleidoscope::plugin::CharShift::KeyPair(Key_Slash, Key_Backslash),     // slash and backslash
-    kaleidoscope::plugin::CharShift::KeyPair(LSHIFT(Key_1), LSHIFT(Key_8))  // bang and star
+    kaleidoscope::plugin::CharShift::KeyPair(Key_LeftParen, LSHIFT(Key_Comma)),         // ( <
+    kaleidoscope::plugin::CharShift::KeyPair(Key_RightParen, LSHIFT(Key_Period)),       // ) >
+    kaleidoscope::plugin::CharShift::KeyPair(Key_LeftCurlyBracket, Key_LeftBracket),    // { [
+    kaleidoscope::plugin::CharShift::KeyPair(Key_RightCurlyBracket, Key_RightBracket),  // } ]
+    kaleidoscope::plugin::CharShift::KeyPair(Key_Slash, Key_Backslash)                  // / backslash
   );
 }
 
